@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的小站</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#181818;
+    color:#eee;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    gap:20px;
+  }
+  h1{
+    font-size:26px;
+    font-weight:600;
+    letter-spacing:1px;
+    color:#fff;
+    margin-bottom:8px;
+  }
+  .sub{
+    font-size:13px;
+    color:#888;
+    margin-bottom:16px;
+  }
+  .card-wrap{
+    width:100%;
+    max-width:420px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  a.card{
+    display:block;
+    text-decoration:none;
+    background:#242424;
+    border:1px solid #333;
+    border-radius:14px;
+    padding:18px 20px;
+    transition:background .15s, border-color .15s, transform .1s;
+  }
+  a.card:active{
+    background:#2e2e2e;
+    transform:scale(.985);
+  }
+  a.card:hover{
+    border-color:#ff6622;
+  }
+  .card-title{
+    font-size:18px;
+    font-weight:600;
+    color:#fff;
+    margin-bottom:6px;
+  }
+  .card-desc{
+    font-size:13px;
+    color:#999;
+    line-height:1.5;
+  }
+  .tag{
+    display:inline-block;
+    font-size:11px;
+    padding:2px 8px;
+    border-radius:6px;
+    margin-left:8px;
+    vertical-align:middle;
+    font-weight:400;
+  }
+  .tag.game{background:#3a2a1a;color:#ffaa55;}
+  .tag.tool{background:#1a2a3a;color:#55aaff;}
+  footer{
+    font-size:12px;
+    color:#555;
+    margin-top:20px;
+  }
+</style>
+</head>
+<body>
+
+  <h1>我的小站</h1>
+  <div class="sub">随便做了点东西，点进去玩</div>
+
+  <div class="card-wrap">
+
+    <a class="card" href="steak.html">
+      <div class="card-title">🥩 烤牛排 &amp; 烤鱼模拟<span class="tag game">小游戏</span></div>
+      <div class="card-desc">指针来回走，看准火候点「出锅」。烤糊还是臻品，全看手速。</div>
+    </a>
+
+    <a class="card" href="drda.html">
+      <div class="card-title">💬 DELTARUNE 对话生成器<span class="tag tool">工具</span></div>
+      <div class="card-desc">V0.80 · 做 DELTARUNE 风格的对话。文件较大，首次打开可能要等一会儿。</div>
+    </a>
+
+  </div>
+
+  <footer>Made with ❤️</footer>
+
+</body>
+</html>
