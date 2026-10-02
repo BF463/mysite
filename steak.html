@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>烤牛排&烤鱼模拟</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: sans-serif;
+            background-color: #222;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            gap:24px;
+            padding:20px;
+        }
+        h1 {
+            font-size: 32px;
+            color: #ff8833;
+        }
+        .mode-btn-wrap{
+            display:flex;
+            gap:12px;
+        }
+        .record-panel{
+            display:flex;
+            gap:16px;
+            font-size:16px;
+            flex-wrap: wrap;
+            justify-content:center;
+        }
+        .fish-record{
+            color:#4ac8ff;
+        }
+        .progress-wrap {
+            width: 90vw;
+            max-width: 360px;
+            height: 22px;
+            position: relative;
+            border-radius: 11px;
+            overflow: hidden;
+            display: flex;
+        }
+        .seg-gray-left {
+            width: 30%;
+            background-color: #666666;
+        }
+        .seg-yellow-left {
+            width: 15%;
+            background-color: #ffcc00;
+        }
+        .seg-red-center {
+            width: 10%;
+            background-color: #ff2222;
+        }
+        .seg-yellow-right {
+            width: 15%;
+            background-color: #ffcc00;
+        }
+        .seg-gray-right {
+            width: 30%;
+            background-color: #666666;
+        }
+        .pointer {
+            width: 10px;
+            height: 28px;
+            background-color: #ffffff;
+            border-radius: 3px;
+            position: absolute;
+            top: -3px;
+        }
+        .fire-area{
+            display:flex;
+            gap:8px;
+            min-height:32px;
+            font-size:28px;
+        }
+        button{
+            padding:12px 24px;
+            font-size:18px;
+            background:#ff6622;
+            border:none;
+            color:white;
+            border-radius:8px;
+            cursor:pointer;
+        }
+        button:active{
+            background:#dd4411;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="titleText">烤牛排模拟</h1>
+    <div class="mode-btn-wrap">
+        <button id="modeSteak">牛排模式</button>
+        <button id="modeFish">切换为烤鱼</button>
+    </div>
+
+    <div class="record-panel">
+        <div>牛排‑烤糊:<span id="st0">0</span></div>
+        <div>牛排‑普通:<span id="st1">0</span></div>
+        <div>牛排‑美味:<span id="st2">0</span></div>
+        <div>牛排‑臻品:<span id="st3">0</span></div>
+    </div>
+    <div class="record-panel fish-record">
+        <div>烤鱼‑焦糊:<span id="fi0">0</span></div>
+        <div>烤鱼‑美味:<span id="fi1">0</span></div>
+        <div>烤鱼‑至臻:<span id="fi2">0</span></div>
+    </div>
+
+    <div class="progress-wrap">
+        <div class="seg-gray-left"></div>
+        <div class="seg-yellow-left"></div>
+        <div class="seg-red-center"></div>
+        <div class="seg-yellow-right"></div>
+        <div class="seg-gray-right"></div>
+        <div class="pointer" id="pointer"></div>
+    </div>
+
+    <div class="fire-area" id="fireArea"></div>
+    <button id="cookBtn">出锅</button>
+
+<script>
+const pointer = document.getElementById('pointer');
+const wrap = document.querySelector('.progress-wrap');
+const fireArea = document.getElementById('fireArea');
+const cookBtn = document.getElementById('cookBtn');
+const titleText = document.getElementById('titleText');
+const modeSteak = document.getElementById('modeSteak');
+const modeFish = document.getElementById('modeFish');
+
+//牛排统计
+const st0 = document.getElementById('st0');
+const st1 = document.getElementById('st1');
+const st2 = document.getElementById('st2');
+const st3 = document.getElementById('st3');
+//烤鱼统计
+const fi0 = document.getElementById('fi0');
+const fi1 = document.getElementById('fi1');
+const fi2 = document.getElementById('fi2');
+
+let pos = 0;
+let direction = 1;
+let animId = null;
+let stopFlag = false;
+
+let fireCount = 0;
+let missCount = 0;
+let outCount = 0;
+let isFishMode = false;
+
+//两套独立统计
+const steakStats = {bad:0, normal:0, good:0, perfect:0};
+const fishStats = {burn:0, tasty:0, supreme:0};
+
+function getSpeed(){
+    let cycle;
+    if(!isFishMode){
+        if(outCount === 0) cycle = 250;
+        else if(outCount ===1) cycle = 125;
+        else cycle = 80;
+    }else{
+        if(outCount <=2) cycle = 250;
+        else cycle = 125;
+    }
+    const w = wrap.clientWidth - pointer.offsetWidth;
+    const pxPerMs = (w*2)/cycle;
+    return pxPerMs;
+}
+
+function animate(){
+    if(stopFlag){
+        animId = requestAnimationFrame(animate);
+        return;
+    }
+    const w = wrap.clientWidth - pointer.offsetWidth;
+    const speed = getSpeed();
+    pos += direction * speed;
+    if(pos >= w){
+        direction = -1;
+    }
+    if(pos <=0){
+        direction = 1;
+    }
+    pointer.style.left = pos + 'px';
+    animId = requestAnimationFrame(animate);
+}
+
+function getZone(){
+    const total = wrap.clientWidth;
+    const pct = pos / total *100;
+    if(pct <30 || pct >=70){
+        return "gray";
+    }else if((pct>=30 && pct<45) || (pct>=55 && pct<70)){
+        return "yellow";
+    }else{
+        return "red";
+    }
+}
+
+function resetPointer(){
+    const w = wrap.clientWidth - pointer.offsetWidth;
+    const rand = Math.random();
+    if(rand < 0.5){
+        pos = Math.random() * (w * 0.3);
+    }else{
+        pos = w * 0.7 + Math.random() * (w * 0.3);
+    }
+    direction = Math.random()>0.5 ? 1 : -1;
+    pointer.style.left = pos+'px';
+}
+
+function clearFire(){
+    fireCount =0;
+    fireArea.innerHTML = "";
+}
+
+function updateAllRecord(){
+    st0.innerText = steakStats.bad;
+    st1.innerText = steakStats.normal;
+    st2.innerText = steakStats.good;
+    st3.innerText = steakStats.perfect;
+
+    fi0.innerText = fishStats.burn;
+    fi1.innerText = fishStats.tasty;
+    fi2.innerText = fishStats.supreme;
+}
+
+function fullSettle(){
+    if(!isFishMode){
+        if(fireCount ===0){
+            steakStats.bad++;
+        }else if(fireCount ===1){
+            steakStats.normal++;
+        }else if(fireCount ===2){
+            steakStats.good++;
+        }else if(fireCount >=3){
+            steakStats.perfect++;
+        }
+    }else{
+        if(fireCount ===0){
+            fishStats.burn++;
+        }else if(fireCount <5){
+            fishStats.tasty++;
+        }else{
+            fishStats.supreme++;
+        }
+    }
+    updateAllRecord();
+    clearFire();
+    missCount =0;
+    outCount =0;
+    resetPointer();
+}
+
+function switchMode(fish){
+    isFishMode = fish;
+    clearFire();
+    missCount =0;
+    outCount =0;
+    resetPointer();
+    if(isFishMode){
+        titleText.innerText = "烤鱼模拟";
+    }else{
+        titleText.innerText = "烤牛排模拟";
+    }
+}
+
+cookBtn.onclick = function(){
+    stopFlag = true;
+    setTimeout(()=>{stopFlag=false;},300);
+
+    const zone = getZone();
+    missCount++;
+
+    if(zone === "gray"){
+        fullSettle();
+    }else if(zone === "red"){
+        fireCount++;
+        fireArea.innerHTML = "🔥".repeat(fireCount);
+    }
+
+    outCount++;
+    const maxOut = isFishMode ?5:3;
+    if(missCount >= maxOut){
+        fullSettle();
+    }
+    resetPointer();
+}
+
+modeSteak.onclick = ()=>switchMode(false);
+modeFish.onclick = ()=>switchMode(true);
+
+updateAllRecord();
+resetPointer();
+animate();
+</script>
+</body>
+</html>
