@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>游戏合集 - 我的小站</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#181818;color:#eee;
+    min-height:100vh;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:24px;gap:20px;
+  }
+  h1{font-size:26px;font-weight:600;letter-spacing:1px;color:#fff;margin-bottom:8px;}
+  .sub{font-size:13px;color:#888;margin-bottom:16px;}
+  .card-wrap{width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px;}
+  a.card{
+    display:block;text-decoration:none;background:#242424;border:1px solid #333;
+    border-radius:14px;padding:18px 20px;transition:background .15s,border-color .15s,transform .1s;
+  }
+  a.card:active{background:#2e2e2e;transform:scale(.985);}
+  a.card:hover{border-color:#ff6622;}
+  .card-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:6px;}
+  .card-desc{font-size:13px;color:#999;line-height:1.5;}
+  .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;margin-left:8px;vertical-align:middle;font-weight:400;}
+  .tag.arcade{background:#3a1a1a;color:#ff7777;}
+  .tag.puzzle{background:#1a2a1a;color:#77dd77;}
+  .tag.casual{background:#2a1a3a;color:#cc88ff;}
+  a.back{
+    display:inline-block;text-decoration:none;color:#888;font-size:14px;
+    margin-top:8px;padding:8px 16px;
+  }
+  a.back:active{color:#fff;}
+  footer{font-size:12px;color:#555;margin-top:12px;}
+</style>
+</head>
+<body>
+
+  <h1>🎮 游戏合集</h1>
+  <div class="sub">挑一个玩玩，手机竖屏优化</div>
+
+  <div class="card-wrap">
+
+    <a class="card" href="game-snake.html">
+      <div class="card-title">🐍 贪吃蛇<span class="tag arcade">街机</span></div>
+      <div class="card-desc">滑动或方向键控制，吃到果子变长。撞墙撞自己就结束，看你能多长。</div>
+    </a>
+
+    <a class="card" href="game-2048.html">
+      <div class="card-title">🔢 2048<span class="tag puzzle">益智</span></div>
+      <div class="card-desc">滑动合并相同数字，凑出 2048。看着简单，手滑就凉。</div>
+    </a>
+
+    <a class="card" href="game-memory.html">
+      <div class="card-title">🃏 记忆翻牌<span class="tag casual">休闲</span></div>
+      <div class="card-desc">翻开卡片记住位置，找出所有配对。考验记忆，越少翻错越好。</div>
+    </a>
+
+  </div>
+
+  <a class="back" href="index.html">← 返回首页</a>
+  <footer>Made with ❤️</footer>
+
+</body>
+</html>

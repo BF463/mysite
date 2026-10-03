@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>记忆翻牌 - 游戏合集</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overscroll-behavior:none;}
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#181818;color:#eee;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:16px;gap:16px;user-select:none;
+  }
+  .top{width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;}
+  .stat{font-size:14px;color:#aaa;}
+  .stat b{color:#ffaa55;font-size:18px;}
+  .board{
+    display:grid;gap:10px;
+    width:100%;max-width:420px;
+    perspective:800px;
+  }
+  .cell{
+    aspect-ratio:1/1;position:relative;
+    transform-style:preserve-3d;
+    transition:transform .35s;
+    cursor:pointer;
+  }
+  .cell.flip{transform:rotateY(180deg);}
+  .cell .face{
+    position:absolute;inset:0;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    backface-visibility:hidden;-webkit-backface-visibility:hidden;
+    font-size:clamp(28px,9vw,44px);
+  }
+  .cell .back{
+    background:#2a2a2a;border:1px solid #3a3a3a;
+    font-size:clamp(20px,6vw,32px);color:#555;
+  }
+  .cell .back::after{content:'?';}
+  .cell .front{
+    background:#33302a;border:1px solid #4a4438;
+    transform:rotateY(180deg);
+  }
+  .cell.matched .front{
+    background:#2a3a2a;border-color:#4a7a4a;
+    animation:pop .3s;
+  }
+  .cell.matched{opacity:.7;}
+  @keyframes pop{0%{transform:rotateY(180deg) scale(1);}50%{transform:rotateY(180deg) scale(1.08);}100%{transform:rotateY(180deg) scale(1);}}
+  button{
+    font-family:inherit;font-size:15px;padding:10px 24px;border-radius:10px;
+    border:1px solid #444;background:#242424;color:#eee;cursor:pointer;
+  }
+  button:active{background:#333;}
+  button.primary{border-color:#ff6622;color:#ffaa55;}
+  .bottom{display:flex;gap:12px;align-items:center;}
+  .win{
+    position:fixed;inset:0;background:rgba(0,0,0,.75);
+    display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px;
+    z-index:10;
+  }
+  .win.show{display:flex;}
+  .win h2{font-size:28px;color:#ffd700;}
+  .win p{color:#aaa;font-size:15px;}
+  a.back{text-decoration:none;color:#666;font-size:13px;padding:6px;}
+</style>
+</head>
+<body>
+
+  <div class="top">
+    <div class="stat">步数 <b id="moves">0</b></div>
+    <div class="stat">配对 <b id="pairs">0</b>/<span id="total">0</span></div>
+  </div>
+
+  <div class="board" id="board"></div>
+
+  <div class="bottom">
+    <button class="primary" id="restart">重新开始</button>
+  </div>
+
+  <a class="back" href="games.html">← 返回合集</a>
+
+  <div class="win" id="win">
+    <h2>🎉 全部配对！</h2>
+    <p id="winInfo"></p>
+    <button class="primary" id="winBtn">再来一局</button>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  const POOL = ['🍎','🍌','🍇','🍓','🍑','🍍','🥝','🍉','🍒','🥥'];
+  const board = document.getElementById('board');
+  const movesEl = document.getElementById('moves');
+  const pairsEl = document.getElementById('pairs');
+  const totalEl = document.getElementById('total');
+  const win = document.getElementById('win');
+  const winInfo = document.getElementById('winInfo');
+  const winBtn = document.getElementById('winBtn');
+
+  let first, second, lock, moves, matched, pairCount, deck;
+
+  function init(){
+    pairCount = 8; // 8 对 = 16 张
+    const choose = POOL.slice(0, pairCount);
+    deck = choose.concat(choose).map(v=>({v, id:Math.random()}));
+    // 洗牌
+    for(let i=deck.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [deck[i],deck[j]] = [deck[j],deck[i]];
+    }
+    moves = 0; matched = 0; first = second = null; lock = false;
+    movesEl.textContent = 0;
+    pairsEl.textContent = 0;
+    totalEl.textContent = pairCount;
+    win.classList.remove('show');
+    render();
+  }
+
+  function render(){
+    board.innerHTML = '';
+    const cols = 4;
+    board.style.gridTemplateColumns = 'repeat(' + cols + ', 1fr)';
+    deck.forEach((card, i)=>{
+      const el = document.createElement('div');
+      el.className = 'cell';
+      el.dataset.idx = i;
+      el.innerHTML = '<div class="face back"></div><div class="face front">'+card.v+'</div>';
+      el.addEventListener('click', ()=>flip(i));
+      board.appendChild(el);
+    });
+  }
+
+  function flip(i){
+    if(lock) return;
+    const el = board.children[i];
+    if(!el || el.classList.contains('flip')) return;
+    el.classList.add('flip');
+
+    if(first === null){
+      first = i;
+      return;
+    }
+    // 第二次
+    second = i;
+    moves++;
+    movesEl.textContent = moves;
+    lock = true;
+
+    const a = board.children[first], b = board.children[second];
+    if(deck[first].v === deck[second].v){
+      // 配对成功
+      setTimeout(()=>{
+        a.classList.add('matched');
+        b.classList.add('matched');
+        matched++;
+        pairsEl.textContent = matched;
+        first = second = null;
+        lock = false;
+        if(matched === pairCount) finish();
+      }, 300);
+    }else{
+      // 翻回
+      setTimeout(()=>{
+        a.classList.remove('flip');
+        b.classList.remove('flip');
+        first = second = null;
+        lock = false;
+      }, 800);
+    }
+  }
+
+  function finish(){
+    setTimeout(()=>{
+      winInfo.textContent = '用了 ' + moves + ' 步';
+      win.classList.add('show');
+    }, 400);
+  }
+
+  document.getElementById('restart').addEventListener('click', init);
+  winBtn.addEventListener('click', init);
+
+  init();
+})();
+</script>
+</body>
+</html>
