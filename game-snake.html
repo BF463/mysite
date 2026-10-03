@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>贪吃蛇 - 游戏合集</title>
+<script src="theme.js" defer></script>
 <style>
+  :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;overscroll-behavior:none;}
   body{
@@ -15,7 +17,7 @@
   }
   .top{width:100%;max-width:440px;display:flex;justify-content:space-between;align-items:center;}
   .score{font-size:15px;color:#aaa;}
-  .score b{color:#ffaa55;font-size:20px;}
+  .score b{color:var(--accent-soft);font-size:20px;}
   .best{font-size:13px;color:#666;}
   canvas{
     background:#101010;border:2px solid #333;border-radius:12px;
@@ -30,7 +32,7 @@
     transition:background .15s;
   }
   button:active{background:#333;}
-  button.primary{border-color:#ff6622;color:#ffaa55;}
+  button.primary{border-color:var(--accent);color:var(--accent-soft);}
   a.back{text-decoration:none;color:#666;font-size:13px;padding:6px;}
 </style>
 </head>
