@@ -78,11 +78,22 @@
   }
   .tag.game{background:#3a2a1a;color:#ffaa55;}
   .tag.tool{background:#1a2a3a;color:#55aaff;}
+  .section-title{
+    font-size:13px;
+    color:#777;
+    letter-spacing:2px;
+    margin:6px 2px 2px;
+    font-weight:500;
+  }
+  .section-title:first-child{margin-top:0;}
   footer{
     font-size:12px;
     color:#555;
     margin-top:20px;
+    text-align:center;
+    line-height:1.8;
   }
+  footer .mail{color:#888;}
 </style>
 </head>
 <body>
@@ -92,20 +103,26 @@
 
   <div class="card-wrap">
 
+    <div class="section-title">— 小游戏 —</div>
+
     <a class="card" href="steak.html">
       <div class="card-title">🥩 烤牛排 &amp; 烤鱼模拟<span class="tag game">小游戏</span></div>
       <div class="card-desc">指针来回走，看准火候点「出锅」。烤糊还是臻品，全看手速。</div>
     </a>
+
+    <a class="card" href="games.html">
+      <div class="card-title">🎮 游戏合集<span class="tag game">小游戏</span></div>
+      <div class="card-desc">贪吃蛇 · 2048 · 记忆翻牌 · 扫雷 · 五子棋。竖屏触摸优化，点进去挑一个玩。</div>
+    </a>
+
+    <div class="section-title">— 工具 —</div>
 
     <a class="card" href="drda.html">
       <div class="card-title">💬 DELTARUNE 对话生成器<span class="tag tool">工具</span></div>
       <div class="card-desc">V0.80 · 做 DELTARUNE 风格的对话。文件较大，首次打开可能要等一会儿。</div>
     </a>
 
-    <a class="card" href="games.html">
-      <div class="card-title">🎮 游戏合集<span class="tag game">小游戏</span></div>
-      <div class="card-desc">贪吃蛇 · 2048 · 记忆翻牌。竖屏触摸优化，点进去挑一个玩。</div>
-    </a>
+    <div class="section-title">— 其他 —</div>
 
     <a class="card" href="javascript:void(0)" onclick="Rank&&Rank.openPanel()">
       <div class="card-title">🏆 总排行榜</div>
@@ -114,7 +131,10 @@
 
   </div>
 
-  <footer>Made with ❤️</footer>
+  <footer>
+    Made with ❤️<br>
+    <span class="mail">建议/反馈找 czh：17321075081@163.com</span>
+  </footer>
 
 </body>
 </html>
