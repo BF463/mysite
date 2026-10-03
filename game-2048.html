@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>2048 - 游戏合集</title>
 <script src="theme.js" defer></script>
+<script src="rank.js" defer></script>
 <style>
   :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -62,6 +63,7 @@
   </div>
 
   <div class="hint">滑动屏幕 / 方向键 移动方块</div>
+  <a class="back" href="javascript:void(0)" onclick="Rank&&Rank.openPanel()">🏆 排行榜</a>
   <a class="back" href="games.html">← 返回合集</a>
 
 <script>
@@ -199,6 +201,15 @@
 
     score += gained;
     scoreEl.textContent = score;
+
+    // 破纪录即提交（本地最高分 + 云端排行榜）
+    if(score > best){
+      best = score;
+      try{ localStorage.setItem('g2048_best', best); }catch(e){}
+      bestEl.textContent = best;
+      if(window.Rank && Rank.submit) Rank.submit('2048', best);
+    }
+
     addTile();
     draw();
 
@@ -213,7 +224,6 @@
       ovMsg.textContent = '游戏结束';
       ovBtn.textContent = '再来一局';
       overlay.classList.add('show');
-      if(score > best){ best = score; localStorage.setItem('g2048_best', best); bestEl.textContent = best; }
     }
   }
 

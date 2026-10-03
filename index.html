@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>我的小站</title>
 <script src="theme.js" defer></script>
+<script src="rank.js" defer></script>
 <style>
   :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -104,6 +105,11 @@
     <a class="card" href="games.html">
       <div class="card-title">🎮 游戏合集<span class="tag game">小游戏</span></div>
       <div class="card-desc">贪吃蛇 · 2048 · 记忆翻牌。竖屏触摸优化，点进去挑一个玩。</div>
+    </a>
+
+    <a class="card" href="javascript:void(0)" onclick="Rank&&Rank.openPanel()">
+      <div class="card-title">🏆 总排行榜</div>
+      <div class="card-desc">所有玩家的总积分排名，点开看看自己第几。</div>
     </a>
 
   </div>
