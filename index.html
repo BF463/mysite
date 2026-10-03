@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>我的小站</title>
+<script src="theme.js" defer></script>
 <style>
+  :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{
     font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
@@ -51,7 +53,7 @@
     transform:scale(.985);
   }
   a.card:hover{
-    border-color:#ff6622;
+    border-color:var(--accent);
   }
   .card-title{
     font-size:18px;
