@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>记忆翻牌 - 游戏合集</title>
+<script src="theme.js" defer></script>
 <style>
+  :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;overscroll-behavior:none;}
   body{
@@ -15,7 +17,7 @@
   }
   .top{width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;}
   .stat{font-size:14px;color:#aaa;}
-  .stat b{color:#ffaa55;font-size:18px;}
+  .stat b{color:var(--accent-soft);font-size:18px;}
   .board{
     display:grid;gap:10px;
     width:100%;max-width:420px;
@@ -54,7 +56,7 @@
     border:1px solid #444;background:#242424;color:#eee;cursor:pointer;
   }
   button:active{background:#333;}
-  button.primary{border-color:#ff6622;color:#ffaa55;}
+  button.primary{border-color:var(--accent);color:var(--accent-soft);}
   .bottom{display:flex;gap:12px;align-items:center;}
   .win{
     position:fixed;inset:0;background:rgba(0,0,0,.75);
