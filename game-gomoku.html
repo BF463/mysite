@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>五子棋 - 游戏合集</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='2' width='20' height='20' rx='3' fill='%23c89b5a'/%3E%3Ccircle cx='9' cy='12' r='4' fill='%23222'/%3E%3Ccircle cx='15' cy='12' r='4' fill='%23eee'/%3E%3C/svg%3E">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;overscroll-behavior:none;}
+  body{
+    font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:#181818;color:#eee;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    padding:16px;gap:14px;user-select:none;-webkit-user-select:none;
+  }
+  .top{width:100%;max-width:420px;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .turn{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:600;}
+  .turn .disc{width:18px;height:18px;border-radius:50%;display:inline-block;flex:none;box-shadow:inset -2px -2px 4px rgba(0,0,0,.4);}
+  .disc.black{background:#22252b;border:1px solid #555;}
+  .disc.white{background:#f2f4f7;border:1px solid #bbb;}
+  .turn .side{color:#888;font-size:12px;font-weight:500;}
+  .acts{display:flex;gap:8px;}
+  button{
+    font-family:inherit;font-size:14px;padding:9px 18px;border-radius:10px;
+    border:1px solid #444;background:#242424;color:#eee;cursor:pointer;
+  }
+  button:active{background:#333;}
+  .acts button.primary{border-color:#ff6622;color:#ffaa55;}
+  .board-wrap{position:relative;}
+  canvas{display:block;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.4);max-width:100%;}
+  .marker{
+    position:absolute;width:0;height:0;border-style:solid;
+    border-width:9px 6px 0 6px;border-color:#ff5c5c transparent transparent transparent;
+    transform:translate(-50%,-3px);pointer-events:none;transition:left .18s,top .18s;
+    filter:drop-shadow(0 1px 2px rgba(0,0,0,.6));z-index:2;
+  }
+  .hint{font-size:12px;color:#666;text-align:center;}
+  a.back{text-decoration:none;color:#666;font-size:13px;padding:6px;}
+  .overlay{
+    position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:50;
+    display:none;align-items:center;justify-content:center;
+  }
+  .overlay.show{display:flex;}
+  .overlay .card{
+    background:#242424;border:1px solid #333;border-radius:16px;
+    padding:26px 34px;text-align:center;animation:pop .22s ease;
+  }
+  .overlay h2{font-size:22px;margin:4px 0;color:#fff;}
+  .overlay p{color:#888;font-size:13px;margin-bottom:16px;}
+  .overlay .btns{display:flex;gap:10px;justify-content:center;}
+  .overlay button.primary{border-color:#ff6622;color:#ffaa55;}
+  @keyframes pop{from{transform:scale(.86);opacity:0;}to{transform:scale(1);opacity:1;}}
+</style>
+</head>
+<body>
+
+  <div class="top">
+    <div class="turn">
+      <span class="disc" id="turnDisc"></span>
+      <span id="turnText">黑棋</span>
+      <span class="side" id="turnSide">先手</span>
+    </div>
+    <div class="acts">
+      <button id="undoBtn">悔棋</button>
+      <button id="restartBtn" class="primary">重开</button>
+    </div>
+  </div>
+
+  <div class="board-wrap">
+    <div id="board"><canvas id="cv"></canvas></div>
+  </div>
+
+  <div class="hint">点击交叉点落子 · 黑白交替 · 五连为胜（支持悔棋）</div>
+  <a class="back" href="games.html">← 返回合集</a>
+
+  <div class="overlay" id="overlay">
+    <div class="card">
+      <h2 id="ovTitle"></h2>
+      <p id="ovSub"></p>
+      <div class="btns">
+        <button id="undoOv">悔棋</button>
+        <button id="againOv" class="primary">再来一局</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  var SIZE = 15;
+  var cv = document.getElementById('cv');
+  var ctx = cv.getContext('2d');
+  var wrap = document.getElementById('board');
+
+  var turnDisc = document.getElementById('turnDisc');
+  var turnText = document.getElementById('turnText');
+  var turnSide = document.getElementById('turnSide');
+  var overlay = document.getElementById('overlay');
+  var ovTitle = document.getElementById('ovTitle');
+  var ovSub = document.getElementById('ovSub');
+
+  var board, current, history, over, marker;
+  var unit, pad, radius;
+  var lastTouch = 0;   // 触摸去重：记录最近一次 touchstart 的时间
+
+  function init() {
+    var avail = Math.min(wrap.clientWidth || 340, 440);
+    var size = Math.min(avail, 440);
+    var dpr = Math.max(window.devicePixelRatio || 1, 2);
+    cv.width = size * dpr; cv.height = size * dpr;
+    cv.style.width = size + 'px'; cv.style.height = size + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    pad = size / 17;
+    unit = (size - pad * 2) / (SIZE - 1);
+    radius = unit * 0.42;
+    newGame(true);
+  }
+
+  function newGame(quiet) {
+    board = Array.from({ length: SIZE }, function(){ return new Array(SIZE).fill(0); });
+    current = 1; history = []; over = false;
+    marker = null; clearMarker();
+    draw();
+    setTurn();
+    if (!quiet) { overlay.classList.remove('show'); }
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    ctx.strokeStyle = '#8a6531';
+    ctx.lineWidth = 1;
+    for (var i = 0; i < SIZE; i++) {
+      var p = pad + i * unit;
+      ctx.beginPath(); ctx.moveTo(pad, p); ctx.lineTo(pad + (SIZE-1)*unit, p); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(p, pad); ctx.lineTo(p, pad + (SIZE-1)*unit); ctx.stroke();
+    }
+    var stars = [[3,3],[3,11],[7,7],[11,3],[11,11]];
+    ctx.fillStyle = '#6d4c26';
+    stars.forEach(function(s){
+      ctx.beginPath();
+      ctx.arc(pad + s[0]*unit, pad + s[1]*unit, unit*0.09, 0, Math.PI*2);
+      ctx.fill();
+    });
+    for (var r = 0; r < SIZE; r++) {
+      for (var c = 0; c < SIZE; c++) {
+        if (!board[r][c]) continue;
+        drawStone(pad + c*unit, pad + r*unit, board[r][c]);
+      }
+    }
+  }
+
+  function drawStone(x, y, color) {
+    ctx.beginPath();
+    ctx.arc(x + unit*0.04, y + unit*0.06, radius, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,.28)';
+    ctx.fill();
+    var grad = ctx.createRadialGradient(x - radius*0.3, y - radius*0.35, radius*0.15, x, y, radius);
+    if (color === 1) {
+      grad.addColorStop(0, '#4a4f58');
+      grad.addColorStop(1, '#181b20');
+    } else {
+      grad.addColorStop(0, '#ffffff');
+      grad.addColorStop(1, '#cfd3da');
+    }
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI*2);
+    ctx.fillStyle = grad;
+    ctx.fill();
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = color === 1 ? '#0d0f12' : '#b9bec7';
+    ctx.stroke();
+  }
+
+  function setTurn() {
+    turnDisc.className = 'disc ' + (current === 1 ? 'black' : 'white');
+    turnText.textContent = current === 1 ? '黑棋' : '白棋';
+    turnSide.textContent = current === 1 ? '先手' : '后手';
+  }
+
+  function ptFromEvent(e) {
+    var rect = cv.getBoundingClientRect();
+    var t = e.touches ? e.touches[0] : e;
+    var x = t.clientX - rect.left, y = t.clientY - rect.top;
+    var c = Math.round((x - pad) / unit);
+    var r = Math.round((y - pad) / unit);
+    if (c < 0 || c > SIZE-1 || r < 0 || r > SIZE-1) return null;
+    var dx = x - (pad + c*unit), dy = y - (pad + r*unit);
+    if (dx*dx + dy*dy > unit*unit*0.49) return null;
+    return { r: r, c: c };
+  }
+
+  function place(r, c) {
+    if (over || board[r][c]) return false;
+    board[r][c] = current;
+    history.push({ r: r, c: c, color: current });
+    draw();
+    showMarker(r, c);
+    if (checkWin(r, c, current)) { over = true; finish(current); return true; }
+    if (history.length === SIZE*SIZE) { over = true; finish(0); return true; }
+    current = current === 1 ? 2 : 1;
+    setTurn();
+    return true;
+  }
+
+  function checkWin(r, c, color) {
+    var dirs = [[1,0],[0,1],[1,1],[1,-1]];
+    for (var i = 0; i < 4; i++) {
+      var count = 1;
+      var dr = dirs[i][0], dc = dirs[i][1];
+      for (var s = 1; s <= 4; s++) {
+        var nr = r + dr*s, nc = c + dc*s;
+        if (nr<0||nr>=SIZE||nc<0||nc>=SIZE||board[nr][nc]!==color) break;
+        count++;
+      }
+      for (var s = 1; s <= 4; s++) {
+        var nr = r - dr*s, nc = c - dc*s;
+        if (nr<0||nr>=SIZE||nc<0||nc>=SIZE||board[nr][nc]!==color) break;
+        count++;
+      }
+      if (count >= 5) return true;
+    }
+    return false;
+  }
+
+  function finish(color) {
+    if (color === 0) {
+      ovTitle.textContent = '平局';
+      ovSub.textContent = '棋盘已下满';
+    } else {
+      ovTitle.textContent = color === 1 ? '黑棋胜' : '白棋胜';
+      ovSub.textContent = '共 ' + history.length + ' 手，五子连线';
+    }
+    overlay.classList.add('show');
+  }
+
+  function undo() {
+    if (over) { newGame(); return; }
+    if (!history.length) return;
+    var last = history.pop();
+    board[last.r][last.c] = 0;
+    current = last.color;
+    var prev = history[history.length-1];
+    if (prev) showMarker(prev.r, prev.c); else clearMarker();
+    setTurn();
+    draw();
+  }
+
+  function showMarker(r, c) {
+    if (!marker) { marker = document.createElement('div'); marker.className = 'marker'; wrap.appendChild(marker); }
+    marker.style.display = '';
+    marker.style.left = (pad + c*unit) + 'px';
+    marker.style.top = (pad + r*unit) + 'px';
+  }
+  function clearMarker() { if (marker) marker.style.display = 'none'; }
+
+  cv.addEventListener('click', function(e){
+    if (Date.now() - lastTouch < 400) return;   // 触摸后补齐的 click，忽略
+    var p = ptFromEvent(e);
+    if (p) place(p.r, p.c);
+  });
+  cv.addEventListener('touchstart', function(e){
+    lastTouch = Date.now();
+    e.preventDefault();
+    var p = ptFromEvent(e);
+    if (p) place(p.r, p.c);
+  }, { passive: false });
+
+  document.getElementById('undoBtn').addEventListener('click', undo);
+  document.getElementById('undoOv').addEventListener('click', function(){ overlay.classList.remove('show'); undo(); });
+  document.getElementById('restartBtn').addEventListener('click', function(){ newGame(); });
+  document.getElementById('againOv').addEventListener('click', function(){ newGame(); });
+
+  window.addEventListener('resize', function(){ init(); });
+  init();
+})();
+</script>
+</body>
+</html>
