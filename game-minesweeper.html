@@ -4,8 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>扫雷 - 游戏合集</title>
+<script src="theme.js" defer></script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' fill='%23222'/%3E%3Cpath d='M12 4a1 1 0 0 1 1 1v6h6a1 1 0 0 1 0 2h-6v6a1 1 0 0 1-2 0v-6H5a1 1 0 0 1 0-2h6V5a1 1 0 0 1 1-1z' fill='%23e74c3c'/%3E%3C/svg%3E">
 <style>
+  :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{height:100%;overscroll-behavior:none;}
   body{
@@ -21,7 +23,7 @@
     background:#2a2a2a;color:#999;font-family:inherit;font-size:13px;font-weight:600;
     cursor:pointer;transition:.15s;
   }
-  .diff button.active{background:#3a3a3a;border-color:#ff6622;color:#ffaa55;}
+  .diff button.active{background:#3a3a3a;border-color:var(--accent);color:var(--accent-soft);}
   .stats{display:flex;align-items:center;justify-content:space-between;margin-top:12px;}
   .stat{font-family:ui-monospace,Consolas,monospace;font-size:18px;font-weight:700;}
   .stat span{color:#888;font-size:11px;font-weight:500;margin-right:4px;}
@@ -71,8 +73,8 @@
   .overlay h2{font-size:22px;margin:8px 0 4px;color:#fff;}
   .overlay p{color:#888;font-size:13px;margin-bottom:16px;}
   .overlay button{
-    padding:9px 24px;border:1px solid #ff6622;border-radius:10px;background:#242424;
-    color:#ffaa55;font-size:14px;font-weight:600;cursor:pointer;
+    padding:9px 24px;border:1px solid var(--accent);border-radius:10px;background:#242424;
+    color:var(--accent-soft);font-size:14px;font-weight:600;cursor:pointer;
   }
   @keyframes pop{from{transform:scale(.86);opacity:0;}to{transform:scale(1);opacity:1;}}
 </style>
