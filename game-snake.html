@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>贪吃蛇 - 游戏合集</title>
 <script src="theme.js" defer></script>
+<script src="rank.js" defer></script>
 <style>
   :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -53,6 +54,7 @@
   </div>
 
   <a class="back" href="games.html">← 返回合集</a>
+  <a class="back" href="javascript:void(0)" onclick="Rank&&Rank.openPanel()" style="color:#ffaa55;">🏆 排行榜</a>
 
 <script>
 (function(){
@@ -189,6 +191,8 @@
       localStorage.setItem('snake_best', best);
       bestEl.textContent = best;
     }
+    // 提交排行榜：一个果子 50 分
+    if(score > 0 && window.Rank && Rank.submit){ Rank.submit('snake', score * 50); }
     hint.textContent = '游戏结束！得分 ' + score;
     ctx.fillStyle = 'rgba(0,0,0,0.6)';
     ctx.fillRect(0,0,cv.width,cv.height);
