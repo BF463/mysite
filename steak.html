@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>烤牛排&烤鱼模拟</title>
+    <script src="theme.js" defer></script>
+    <script src="rank.js" defer></script>
     <style>
         * {
             margin: 0;
@@ -128,6 +130,11 @@
     <div class="fire-area" id="fireArea"></div>
     <button id="cookBtn">出锅</button>
 
+    <div class="fire-area" style="min-height:auto;gap:16px;font-size:15px;">
+        <a href="javascript:void(0)" onclick="Rank&&Rank.openPanel()" style="color:#ffaa55;text-decoration:none;">🏆 排行榜</a>
+        <a href="games.html" style="color:#888;text-decoration:none;">← 返回合集</a>
+    </div>
+
 <script>
 const pointer = document.getElementById('pointer');
 const wrap = document.querySelector('.progress-wrap');
@@ -235,30 +242,50 @@ function updateAllRecord(){
 }
 
 function fullSettle(){
+    var gain = 0;      // 本次出锅得分
+    var gameKey = "";  // 榜单分类
     if(!isFishMode){
         if(fireCount ===0){
             steakStats.bad++;
+            gain = 2;
         }else if(fireCount ===1){
             steakStats.normal++;
+            gain = 10;
         }else if(fireCount ===2){
             steakStats.good++;
+            gain = 50;
         }else if(fireCount >=3){
             steakStats.perfect++;
+            gain = 70;
         }
+        gameKey = "steak";
     }else{
         if(fireCount ===0){
             fishStats.burn++;
+            gain = 5;
         }else if(fireCount <5){
             fishStats.tasty++;
+            gain = 30;
         }else{
             fishStats.supreme++;
+            gain = 70;
         }
+        gameKey = "fish";
     }
     updateAllRecord();
     clearFire();
     missCount =0;
     outCount =0;
     resetPointer();
+
+    // 累计总分（本地存档）后提交到排行榜
+    try{
+        var key = "total_" + gameKey;
+        var total = parseInt(localStorage.getItem(key) || "0", 10) || 0;
+        total += gain;
+        localStorage.setItem(key, String(total));
+        if(window.Rank && Rank.submit) Rank.submit(gameKey, total);
+    }catch(e){}
 }
 
 function switchMode(fish){
