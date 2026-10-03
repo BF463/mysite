@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>游戏合集 - 我的小站</title>
+<script src="theme.js" defer></script>
 <style>
+  :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   body{
     font-family:-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;
@@ -21,7 +23,7 @@
     border-radius:14px;padding:18px 20px;transition:background .15s,border-color .15s,transform .1s;
   }
   a.card:active{background:#2e2e2e;transform:scale(.985);}
-  a.card:hover{border-color:#ff6622;}
+  a.card:hover{border-color:var(--accent);}
   .card-title{font-size:18px;font-weight:600;color:#fff;margin-bottom:6px;}
   .card-desc{font-size:13px;color:#999;line-height:1.5;}
   .tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:6px;margin-left:8px;vertical-align:middle;font-weight:400;}
