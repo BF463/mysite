@@ -223,10 +223,9 @@
       });
       list.innerHTML = html;
 
-      var myLine = me
-        ? "你第 " + me.rank + " 名 · 总积分 " + me.total
+      var myLine = mine
+        ? "你第 " + mine.rank + " 名 · 总积分 " + mine.total
         : "你还没上榜";
-      var old = me && me.rank ? me.rank : "";
       me.querySelector(".rkMyLine") && me.removeChild(me.querySelector(".rkMyLine"));
       var d = document.createElement("div");
       d.className = "rkMyLine";
