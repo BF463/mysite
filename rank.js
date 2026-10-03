@@ -114,6 +114,42 @@
       .catch(function () { return { rows: [], mine: null }; });
   }
 
+  /* ---------- 单游戏榜 ---------- */
+  /* gameId 可选：snake / 2048 / memory / minesweeper / steak / fish
+   * 返回 { sortedList:[{player_id,player_name,game,points}], myItem, myRank } */
+  function getBoard(gameId) {
+    var url = API + "?select=player_id,player_name,game,points" +
+              "&game=eq." + encodeURIComponent(gameId) +
+              "&order=points.desc&limit=1000";
+    return fetch(url, { headers: headers(), cache: "no-store" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (!Array.isArray(data)) return { sortedList: [], myItem: null, myRank: null };
+
+        var playerBest = {};
+        data.forEach(function (row) {
+          var pid = row.player_id;
+          if (!pid) return;
+          if (!playerBest[pid] || row.points > playerBest[pid].points) playerBest[pid] = row;
+        });
+
+        var sortedList = Object.keys(playerBest).map(function (pid) { return playerBest[pid]; })
+          .sort(function (a, b) { return b.points - a.points; });
+
+        var myId = getUid();
+        var myIndex = -1;
+        for (var i = 0; i < sortedList.length; i++) {
+          if (sortedList[i].player_id === myId) { myIndex = i; break; }
+        }
+        return {
+          sortedList: sortedList,
+          myItem: myIndex === -1 ? null : sortedList[myIndex],
+          myRank: myIndex === -1 ? null : myIndex + 1
+        };
+      })
+      .catch(function () { return { sortedList: [], myItem: null, myRank: null }; });
+  }
+
   /* ---------- 弹层 ---------- */
   var panel = null;
 
@@ -247,6 +283,7 @@
     setName: setName,
     submit: submit,
     fetchBoard: fetchBoard,
+    getBoard: getBoard,
     openPanel: openPanel
   };
 })();
