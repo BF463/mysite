@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>五子棋 - 游戏合集</title>
 <script src="theme.js" defer></script>
+<script src="rank.js" defer></script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='2' y='2' width='20' height='20' rx='3' fill='%23c89b5a'/%3E%3Ccircle cx='9' cy='12' r='4' fill='%23222'/%3E%3Ccircle cx='15' cy='12' r='4' fill='%23eee'/%3E%3C/svg%3E">
 <style>
   :root{--accent:#ff6622;--accent-soft:#ffaa55;}
@@ -75,6 +76,7 @@
 
   <div class="hint">点击交叉点落子 · 黑白交替 · 五连为胜（支持悔棋）</div>
   <a class="back" href="games.html">← 返回合集</a>
+  <a class="back" href="javascript:void(0)" onclick="Rank&&Rank.openPanel()" style="color:#ffaa55;">🏆 排行榜</a>
 
   <div class="overlay" id="overlay">
     <div class="card">
