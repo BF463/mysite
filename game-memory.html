@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>记忆翻牌 - 游戏合集</title>
 <script src="theme.js" defer></script>
+<script src="rank.js" defer></script>
 <style>
   :root{--accent:#ff6622;--accent-soft:#ffaa55;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
@@ -83,6 +84,7 @@
   </div>
 
   <a class="back" href="games.html">← 返回合集</a>
+  <a class="back" href="javascript:void(0)" onclick="Rank&&Rank.openPanel()" style="color:#ffaa55;">🏆 排行榜</a>
 
   <div class="win" id="win">
     <h2>🎉 全部配对！</h2>
@@ -179,6 +181,9 @@
       winInfo.textContent = '用了 ' + moves + ' 步';
       win.classList.add('show');
     }, 400);
+    // 提交排行榜：越少步越高分，100 − (步数−8)×3，最低 0
+    var pts = Math.max(0, 100 - (moves - 8) * 3);
+    if(window.Rank && Rank.submit){ Rank.submit('memory', pts); }
   }
 
   document.getElementById('restart').addEventListener('click', init);
